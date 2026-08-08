@@ -1,9 +1,12 @@
 
 
 
-// Al usar '/' le decimos que se conecte a su propio servidor automáticamente.
-const socket = io('/', {
-    transports: ['polling']
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "*", 
+        methods: ["GET", "POST"]
+    }
+
 
 });
 // 2. Elementos de la pantalla
