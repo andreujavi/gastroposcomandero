@@ -1,5 +1,5 @@
 // 1. Conexión automática al servidor (detecta Fly.io por sí solo)
-const socket = io(window.location.origin);
+const socket = io();
 
 // 2. Elementos de la pantalla
 const estadoConexion = document.getElementById('estado-conexion');
