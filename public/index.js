@@ -1,9 +1,11 @@
-// 1. Conexión automática al servidor (detecta Fly.io por sí solo)
+
+
+
+// 1. CONEXIÓN DIRECTA A RENDER (¡La pieza que faltaba!)
+// Cámbialo por tu enlace real, por ejemplo: 'https://gastroposcomandero.onrender.com'
 const socket = io('https://gastroposcomandero.onrender.com', {
-    transports: ['polling', 'websocket'], 
-    reconnection: true,
-    reconnectionAttempts: 20, 
-    timeout: 60000 
+    transports: ['websocket', 'polling'],
+    secure: true
 });
 
 // 2. Elementos de la pantalla
@@ -11,43 +13,39 @@ const estadoConexion = document.getElementById('estado-conexion');
 const btnEnviar = document.getElementById('btn-enviar');
 const listaComandas = document.getElementById('lista-comandas');
 
-// 3. IDENTIFICACIÓN 100% FUNCIONAL
-// Buscamos en la barra de direcciones si pone "?rol=movil" o "?rol=tablet"
+// 3. IDENTIFICACIÓN FUNCIONAL
 const urlParams = new URLSearchParams(window.location.search);
 const rol = urlParams.get('rol');
 
-// 4. Cuando el servidor nos acepta la conexión
+// 4. CHIVATOS DE CONEXIÓN Y ERRORES
 socket.on('connect', () => {
-    // Si tenemos rol, pedimos entrar a la sala privada de GastroPOS
+    if(estadoConexion) {
+        estadoConexion.textContent = `🟢 Conectado como: ${rol ? rol.toUpperCase() : 'PC'}`;
+        estadoConexion.className = 'estado conectado';
+    }
     if (rol === 'tablet' || rol === 'movil') {
         socket.emit('registro-dispositivo', rol);
-        
-        // Actualizamos el recuadro para que sepas visualmente quién eres
-        if(estadoConexion) {
-            estadoConexion.textContent = `🟢 Conectado como: ${rol.toUpperCase()}`;
-            estadoConexion.className = 'estado conectado';
-        }
-    } else {
-        // Si entras desde el PC sin rol, te avisa de que estás fuera
-        if(estadoConexion) {
-            estadoConexion.textContent = '🟡 Conectado (Fuera de sala/PC)';
-            estadoConexion.className = 'estado';
-        }
     }
 });
 
-socket.on('disconnect', () => {
+socket.on('disconnect', (motivo) => {
     if(estadoConexion) {
-        estadoConexion.textContent = '🔴 Servidor Desconectado';
+        estadoConexion.textContent = `🔴 Desconectado: ${motivo}`;
         estadoConexion.className = 'estado desconectado';
     }
 });
 
-// 5. ENVIAR COMANDAS (Funciona igual para Tablet y Móvil)
+socket.on('connect_error', (error) => {
+    if(estadoConexion) {
+        estadoConexion.textContent = `❌ Error: ${error.message}`;
+        estadoConexion.className = 'estado desconectado';
+    }
+});
+
+// 5. ENVIAR COMANDAS
 if (btnEnviar) {
     btnEnviar.addEventListener('click', () => {
         const nuevaComanda = {
-            // Añadimos el rol para saber visualmente quién lo envió
             producto: `Mesa ${Math.floor(Math.random() * 10) + 1} - Pedido desde ${rol || 'PC'}`,
             hora: new Date().toLocaleTimeString()
         };
@@ -55,12 +53,11 @@ if (btnEnviar) {
     });
 }
 
-// 6. RECIBIR COMANDAS (Solo llegará si estás en la sala)
+// 6. RECIBIR COMANDAS
 socket.on('actualizar-comandas', (comanda) => {
     if (listaComandas) {
         const li = document.createElement('li');
         li.textContent = `${comanda.producto} (${comanda.hora})`;
-        // Ponemos la comanda más nueva arriba
         listaComandas.prepend(li);
     }
 });
