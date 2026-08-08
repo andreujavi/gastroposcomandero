@@ -4,10 +4,9 @@
 // 1. CONEXIÓN DIRECTA A RENDER (¡La pieza que faltaba!)
 // Cámbialo por tu enlace real, por ejemplo: 'https://gastroposcomandero.onrender.com'
 const socket = io('https://gastroposcomandero.onrender.com', {
-    transports: ['websocket', 'polling'],
+    transports: ['polling'], 
     secure: true
 });
-
 // 2. Elementos de la pantalla
 const estadoConexion = document.getElementById('estado-conexion');
 const btnEnviar = document.getElementById('btn-enviar');
