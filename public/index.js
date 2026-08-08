@@ -1,5 +1,10 @@
 // 1. Conexión automática al servidor (detecta Fly.io por sí solo)
-const socket = io({ transports: ['websocket'] });
+const socket = io('https://gastroposcomandero.onrender.com', {
+    transports: ['polling', 'websocket'], 
+    reconnection: true,
+    reconnectionAttempts: 20, 
+    timeout: 60000 
+});
 
 // 2. Elementos de la pantalla
 const estadoConexion = document.getElementById('estado-conexion');
