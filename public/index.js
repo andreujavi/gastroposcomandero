@@ -1,11 +1,10 @@
 
 
 
-// 1. CONEXIÓN DIRECTA A RENDER (¡La pieza que faltaba!)
-// Cámbialo por tu enlace real, por ejemplo: 'https://gastroposcomandero.onrender.com'
-const socket = io('https://gastroposcomandero.onrender.com', {
-    transports: ['polling'], 
-    secure: true
+// Al usar '/' le decimos que se conecte a su propio servidor automáticamente.
+const socket = io('/', {
+    transports: ['polling']
+
 });
 // 2. Elementos de la pantalla
 const estadoConexion = document.getElementById('estado-conexion');
